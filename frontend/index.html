@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Highlight Detector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="container">
+
+        <header class="site-header">
+            <div class="logo-mark">
+                <span class="logo-icon">⚽</span>
+            </div>
+            <div class="header-text">
+                <h1>Intelligent Football Highlights</h1>
+                <p class="subtitle">Automated match analysis — upload a full game, get the moments that matter.</p>
+            </div>
+        </header>
+
+        <main>
+
+            <!-- ── UPLOAD ─────────────────────────────────────── -->
+            <section class="panel" id="uploadCard">
+                <div class="panel-label">STEP 1 — SELECT VIDEO</div>
+
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="videoFile" accept="video/*" required>
+                    <div class="dropzone-inner">
+                        <div class="dropzone-icon">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="4" y="8" width="40" height="32" rx="3" stroke="currentColor"
+                                    stroke-width="2" />
+                                <polygon points="19,17 19,31 33,24" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <p class="dropzone-main">Drop match video here</p>
+                        <p class="dropzone-sub">MP4 · MKV · AVI · MOV · WEBM</p>
+                    </div>
+                    <div class="dropzone-selected hidden" id="fileSelected">
+                        <span class="file-icon">🎬</span>
+                        <span class="file-name" id="fileName">—</span>
+                    </div>
+                </div>
+
+                <button class="btn-upload" id="uploadBtn" disabled>
+                    <span class="btn-label">Analyse Match</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </section>
+
+            <!-- ── STATUS ─────────────────────────────────────── -->
+            <section class="panel hidden" id="statusCard">
+                <div class="panel-label">STEP 2 — PROCESSING</div>
+
+                <div class="status-top">
+                    <div class="job-id-block">
+                        <span class="meta-label">Job</span>
+                        <span class="job-id" id="displayJobId">—</span>
+                    </div>
+                    <span class="status-badge" id="jobStatusBadge">queued</span>
+                </div>
+
+                <div class="scan-track">
+                    <div class="scan-head" id="scanHead"></div>
+                    <div class="scan-fill" id="scanFill"></div>
+                    <div class="scan-labels">
+                        <span>0:00</span><span>22:30</span><span>45:00</span><span>67:30</span><span>90:00</span>
+                    </div>
+                </div>
+
+                <div class="stage-row">
+                    <span class="stage-dot" id="stageDot"></span>
+                    <span class="stage-text" id="displayStage">Initializing…</span>
+                    <span class="progress-pct" id="progressText">0%</span>
+                </div>
+
+                <div class="error-panel hidden" id="errorContainer">
+                    <span class="error-icon">⚠</span>
+                    <span class="error-text" id="errorText"></span>
+                </div>
+            </section>
+
+            <!-- ── RESULTS ────────────────────────────────────── -->
+            <section class="panel hidden" id="resultsCard">
+                <div class="panel-label">STEP 3 — HIGHLIGHTS READY</div>
+
+                <div class="results-hero">
+                    <div class="results-stat" id="statEvents">
+                        <span class="stat-num">—</span>
+                        <span class="stat-lbl">Events detected</span>
+                    </div>
+                    <div class="results-stat" id="statDuration">
+                        <span class="stat-num">—</span>
+                        <span class="stat-lbl">Highlights duration</span>
+                    </div>
+                    <div class="results-stat" id="statRatio">
+                        <span class="stat-num">—</span>
+                        <span class="stat-lbl">Compression ratio</span>
+                    </div>
+                </div>
+
+                <div class="event-list" id="eventList">
+                    <!-- populated by JS -->
+                </div>
+
+                <a id="downloadBtn" class="btn-download" href="#" download>
+                    <span class="dl-icon">↓</span>
+                    Download Highlights
+                </a>
+
+                <details class="raw-details">
+                    <summary>Raw JSON output</summary>
+                    <pre id="resultsJson"></pre>
+                </details>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
