@@ -9,12 +9,6 @@ class FFmpegError(RuntimeError):
 
 
 def run_command(command: list[str]) -> subprocess.CompletedProcess:
-    """
-    Run a shell command safely without shell=True.
-
-    Raises:
-        FFmpegError: if the command exits with a non-zero status.
-    """
     result = subprocess.run(
         command,
         stdout=subprocess.PIPE,
@@ -35,7 +29,6 @@ def run_command(command: list[str]) -> subprocess.CompletedProcess:
 
 
 def get_video_metadata(video_path: Path) -> dict[str, Any]:
-    """Extract basic metadata using ffprobe."""
     command = [
         "ffprobe",
         "-v",
@@ -81,12 +74,6 @@ def get_video_metadata(video_path: Path) -> dict[str, Any]:
 
 
 def extract_audio(video_path: Path, output_wav_path: Path, sample_rate: int) -> Path:
-    """
-    Extract mono WAV audio using FFmpeg.
-
-    Output format:
-        1 channel, PCM WAV, configured sample rate.
-    """
     output_wav_path.parent.mkdir(parents=True, exist_ok=True)
 
     command = [
@@ -111,12 +98,6 @@ def extract_clip_fast(
     start_seconds: float,
     duration_seconds: float,
 ) -> Path:
-    """
-    Extract a clip using fast seeking.
-
-    This is fast because -ss is placed before -i.
-    It may be slightly imprecise around keyframes.
-    """
     output_clip_path.parent.mkdir(parents=True, exist_ok=True)
 
     command = [
@@ -151,19 +132,12 @@ def concatenate_clips(
     output_video_path: Path,
     concat_list_path: Path,
 ) -> Path | None:
-    """
-    Concatenate extracted clips into one final highlights video.
-
-    First tries stream copy for speed.
-    If that fails, falls back to re-encoding for better compatibility.
-    """
     if not clip_paths:
         return None
 
     output_video_path.parent.mkdir(parents=True, exist_ok=True)
     concat_list_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # FFmpeg concat demuxer requires lines like: file '/absolute/path.mp4'
     lines = []
     for path in clip_paths:
         escaped = str(path.resolve()).replace("'", r"'\''")
@@ -188,7 +162,6 @@ def concatenate_clips(
         run_command(copy_command)
         return output_video_path
     except FFmpegError:
-        # Compatibility fallback. Slower, but more robust across clips/codecs.
         reencode_command = [
             "ffmpeg",
             "-y",

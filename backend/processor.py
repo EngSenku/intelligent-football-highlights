@@ -1,10 +1,3 @@
-"""
-processor.py — v6
-------------------
-Passes the new multi-signal audio timeline (sustained, spike, crowd_ratio)
-into detect_highlight_peaks so the detector can use them.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -40,14 +33,13 @@ def _progress(cb, stage: str, value: int) -> None:
 
 
 def _adaptive_max_events(duration_seconds: float) -> int:
-    """No hard cap — let quality gates in detector decide."""
     if duration_seconds >= 80 * 60:
-        return settings.MAX_EVENTS_LONG_MATCH   # 200
+        return settings.MAX_EVENTS_LONG_MATCH
     if duration_seconds >= 45 * 60:
-        return settings.MAX_EVENTS_MEDIUM        # 100
+        return settings.MAX_EVENTS_MEDIUM
     if duration_seconds >= 10 * 60:
-        return settings.MAX_EVENTS_SHORT         # 50
-    return settings.MAX_EVENTS_VERY_SHORT        # 20
+        return settings.MAX_EVENTS_SHORT
+    return settings.MAX_EVENTS_VERY_SHORT
 
 
 def _event_type_counts(events: list[dict]) -> dict[str, int]:
@@ -143,7 +135,6 @@ def process_video(
             weights=fusion_weights,
         )
 
-        # Interpolate all audio signals onto video timestamps
         def _at_video(key: str) -> np.ndarray:
             return np.interp(
                 np.asarray(video_ts, dtype=np.float32),

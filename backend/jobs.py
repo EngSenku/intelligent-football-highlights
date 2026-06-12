@@ -18,7 +18,6 @@ def utc_now_iso() -> str:
 
 
 def create_job(input_filename: str, input_path: str) -> str:
-    """Create an in-memory job entry."""
     job_id = uuid4().hex
 
     with _lock:
@@ -37,14 +36,12 @@ def create_job(input_filename: str, input_path: str) -> str:
 
 
 def get_job(job_id: str) -> dict | None:
-    """Return a copy of a job entry."""
     with _lock:
         job = _jobs.get(job_id)
         return dict(job) if job else None
 
 
 def update_job(job_id: str, **updates) -> None:
-    """Update a job entry safely."""
     with _lock:
         if job_id not in _jobs:
             return
@@ -59,7 +56,6 @@ def submit_processing_job(
     *args,
     **kwargs,
 ) -> None:
-    """Submit a video processing job to the in-memory ThreadPoolExecutor."""
 
     def runner() -> None:
         try:
@@ -84,7 +80,7 @@ def submit_processing_job(
                 progress=100,
                 result=result,
             )
-        except Exception as exc:  # noqa: BLE001 - keep API robust for MVP
+        except Exception as exc:
             update_job(
                 job_id,
                 status="failed",

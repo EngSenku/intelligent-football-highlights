@@ -1,18 +1,3 @@
-"""
-clipper.py — v6
----------------
-Converts detected event timestamps into video clip windows.
-
-Key fixes vs previous versions:
-1. _cap_window_around_best_event only trims clips that grew large due to
-   MERGING multiple events — it never trims a clip that was sized normally
-   from pre+post alone. This prevents cutting a penalty mid-kick.
-2. When trimming is needed, we ALWAYS protect the post (end) side first.
-   The start can be shortened but the action end must stay intact.
-3. The 'max' cap is a merge-safety limit, not an absolute hard cap on
-   correctly-sized single-event clips.
-"""
-
 from pathlib import Path
 
 from .ffmpeg_tools import concatenate_clips, extract_clip_fast
@@ -55,23 +40,7 @@ def _build_single_window(
     default_min: int,
     default_max: int | None,
 ) -> dict:
-    """
-    Build a clip window for a single event using its own pre/post rule.
 
-    Anchor semantics (v7):
-        event["timestamp"]  = the crowd/audio REACTION peak.
-        pre                 = fixed buffer before the reaction peak.
-        action_onset_offset = seconds from peak BACK to where action began
-                              (always <= 0, stored by detector).
-
-    The clip start is:
-        timestamp - pre - abs(action_onset_offset)
-
-    This ensures:
-    1. The actual action start (shot, foul, etc.) is always inside the clip.
-    2. "pre" still provides a build-up buffer on top of that.
-    3. The post side covers the full reaction/celebration from the peak.
-    """
     rule = _event_clip_rule(
         event=event,
         default_pre=default_pre,
@@ -82,13 +51,9 @@ def _build_single_window(
 
     timestamp = float(event["timestamp"])
 
-    # How far back from the reaction peak did the action start?
-    # This is always <= 0. abs() gives positive seconds to add to pre-roll.
     action_onset_offset = float(event.get("action_onset_offset_seconds", 0.0))
     extra_pre = abs(min(action_onset_offset, 0.0))  # always >= 0
 
-    # Total pre = fixed buffer + distance from peak back to action start.
-    # Cap extra_pre at 2× rule["pre"] to prevent runaway clips on noisy signals.
     extra_pre = min(extra_pre, rule["pre"] * 2.0)
     total_pre = rule["pre"] + extra_pre
 
@@ -96,8 +61,6 @@ def _build_single_window(
     end = min(float(video_duration), timestamp + rule["post"])
     duration = end - start
 
-    # If shorter than min (e.g. near video start/end), extend the END only.
-    # Never extend start further — it would undo the precise onset calculation.
     if duration < rule["min"]:
         missing = rule["min"] - duration
         end = min(float(video_duration), end + missing)
@@ -122,18 +85,7 @@ def _cap_window_around_best_event(
     default_min: int,
     default_max: int | None,
 ) -> dict:
-    """
-    Trim a window that grew too large due to merging.
 
-    IMPORTANT: We only trim if the window was created by merging AND the
-    duration substantially exceeds the best event's natural pre+post size.
-    A single-event window sized from pre+post is NEVER trimmed here —
-    it is already the right size.
-
-    When we do trim:
-    - Protect the POST side (end) — never cut the action finish.
-    - Only shorten the PRE side (start) if needed.
-    """
     best = _best_event(window["source_events"])
     best_rule = _event_clip_rule(
         event=best,
@@ -145,16 +97,10 @@ def _cap_window_around_best_event(
 
     current_duration = float(window["end"] - window["start"])
 
-    # Natural duration accounts for action_onset_offset on the best event.
-    # Without this, clips with a long pre-roll (from onset detection) would
-    # be wrongly trimmed as if they grew from merging.
     extra_pre = abs(min(float(best.get("action_onset_offset_seconds", 0.0)), 0.0))
     extra_pre = min(extra_pre, best_rule["pre"] * 2.0)
     natural_duration = best_rule["pre"] + extra_pre + best_rule["post"]
 
-    # If this window was not from a merge, or if duration is within a reasonable
-    # margin of the natural pre+post size — leave it alone.
-    # Allow up to 1.3× natural size before considering trimming.
     if (
         not window.get("_from_merge", False)
         or current_duration <= natural_duration * 1.3
@@ -162,7 +108,6 @@ def _cap_window_around_best_event(
         window["event_rule"] = best_rule
         return window
 
-    # It grew from merging. Apply the max cap but PROTECT the post-event end.
     max_duration = float(best_rule["max"])
 
     if current_duration <= max_duration:
@@ -172,12 +117,9 @@ def _cap_window_around_best_event(
     timestamp = float(best["timestamp"])
     post = float(best_rule["post"])
 
-    # Lock the end: always keep full post-event footage.
-    # Only shorten the start (pre side) if needed.
     end = min(float(video_duration), timestamp + post)
     start = max(0.0, end - max_duration)
 
-    # Ensure we don't push the end past video duration
     if start < 0.0:
         start = 0.0
         end = min(float(video_duration), max_duration)
@@ -208,7 +150,6 @@ def build_clip_windows(
 
     sorted_events = sorted(events, key=lambda e: e["timestamp"])
 
-    # Build individual windows — no max cap applied yet
     raw_windows = [
         _build_single_window(
             event=event,
@@ -221,7 +162,6 @@ def build_clip_windows(
         for event in sorted_events
     ]
 
-    # Merge overlapping / adjacent windows
     merged: list[dict] = []
     for window in raw_windows:
         if not merged:
@@ -234,11 +174,10 @@ def build_clip_windows(
             previous["end"] = max(previous["end"], window["end"])
             previous["timestamps"].extend(window["timestamps"])
             previous["source_events"].extend(window["source_events"])
-            previous["_from_merge"] = True  # mark as merged
+            previous["_from_merge"] = True
         else:
             merged.append(window)
 
-    # Apply cap only on merged windows that grew too large
     valid_windows = []
     for window in merged:
         window = _cap_window_around_best_event(
@@ -260,9 +199,7 @@ def build_clip_windows(
         )
 
         clip_dur = float(window["end"] - window["start"])
-        # FIX: was strict >= rule["min"]. Clips near video start/end are clamped
-        # by the boundary and can't reach full min_duration — they still contain
-        # the event and should be kept. Allow clips >= 75% of min before dropping.
+
         if clip_dur >= rule["min"] * 0.75:
             valid_windows.append(window)
 

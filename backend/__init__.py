@@ -1,1 +1,1 @@
-"""Backend package for the Intelligent Football Highlight Detection MVP."""
+"""Backend package for the Intelligent Football Highlight Detection."""

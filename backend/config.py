@@ -1,7 +1,3 @@
-"""
-config.py — v6 (fixed)
-"""
-
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -35,36 +31,28 @@ class Settings:
     WEIGHT_DENSITY: float = 0.11
     WEIGHT_SCENE: float = 0.12
 
-    # Lower distance → can catch events closer together (foul then free kick)
     PEAK_DISTANCE_SECONDS: int = 18
 
-    # Lower thresholds → detect more, let quality gates filter
-    PEAK_PERCENTILE: float = 75.0  # FIX: was 78.0 — too high, misses quieter goals
-    PEAK_STD_FACTOR: float = 0.70  # FIX: was 0.85 — too aggressive, filters valid peaks
+    PEAK_PERCENTILE: float = 75.0
+    PEAK_STD_FACTOR: float = 0.70
 
-    # Very high caps — quality gates in detector control the real count
-    MAX_EVENTS_VERY_SHORT: int = 20  # < 10 min
-    MAX_EVENTS_SHORT: int = 50  # 10-45 min
-    MAX_EVENTS_MEDIUM: int = 100  # 45-80 min
-    MAX_EVENTS_LONG_MATCH: int = 200  # >= 80 min
+    MAX_EVENTS_VERY_SHORT: int = 20
+    MAX_EVENTS_SHORT: int = 50
+    MAX_EVENTS_MEDIUM: int = 100
+    MAX_EVENTS_LONG_MATCH: int = 200
     MAX_EVENTS: int = 200
 
-    # FIX: was 25 — not far enough back to reach the shot when peak=crowd reaction
     EVENT_REFINEMENT_LOOKBACK_SECONDS: int = 35
-    # FIX: was 8 — too small, sometimes the shot is slightly after the audio onset
+
     EVENT_REFINEMENT_LOOKAHEAD_SECONDS: int = 12
 
-    # FIX: was 18 — 18s pre-roll clips the shot for goals. 35s is the fallback
-    # (per-event rules in detector.py still take priority over this)
     CLIP_PRE_SECONDS: int = 35
     CLIP_POST_SECONDS: int = 35
 
-    # FIX: was 4 — too small. Two detectors firing on the same goal 5-8s apart
-    # produce two candidates; only one survives _merge(). Use 12s so they collapse.
     MERGE_EVENTS_CLOSER_THAN_SECONDS: int = 12
 
     MIN_CLIP_DURATION_SECONDS: int = 20
-    MAX_CLIP_DURATION_SECONDS: int = 130  # full penalty sequence
+    MAX_CLIP_DURATION_SECONDS: int = 130
 
     MAX_WORKERS: int = 1
 

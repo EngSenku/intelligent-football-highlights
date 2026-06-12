@@ -22,7 +22,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Simple dev CORS config. Restrict this in production.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -43,12 +42,6 @@ def health_check() -> dict:
 
 @app.post("/upload")
 async def upload_video(file: UploadFile = File(...)) -> dict:
-    """
-    Upload a football match video and start background processing.
-
-    Returns:
-        job_id that can be used with /status, /results, and /download.
-    """
     filename = safe_filename(file.filename or "uploaded_video.mp4")
     extension = Path(filename).suffix.lower()
 
@@ -58,7 +51,7 @@ async def upload_video(file: UploadFile = File(...)) -> dict:
             detail=f"Unsupported file extension: {extension}",
         )
 
-    job_id = create_job(input_filename=filename, input_path="")  # path set after save
+    job_id = create_job(input_filename=filename, input_path="")
 
     saved_path = settings.UPLOAD_DIR / f"{job_id}_{filename}"
 
@@ -66,7 +59,7 @@ async def upload_video(file: UploadFile = File(...)) -> dict:
         with saved_path.open("wb") as output:
             while chunk := await file.read(1024 * 1024):
                 output.write(chunk)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Could not save upload: {exc}")
 
     update_job(job_id, input_path=str(saved_path))
@@ -81,7 +74,6 @@ async def upload_video(file: UploadFile = File(...)) -> dict:
 
 @app.get("/status/{job_id}")
 def get_status(job_id: str) -> dict:
-    """Return processing status and progress for one job."""
     job = get_job(job_id)
 
     if not job:
@@ -100,7 +92,6 @@ def get_status(job_id: str) -> dict:
 
 @app.get("/results/{job_id}")
 def get_results(job_id: str) -> dict:
-    """Return detected highlight candidates and metadata."""
     job = get_job(job_id)
 
     if not job:
@@ -121,7 +112,6 @@ def get_results(job_id: str) -> dict:
 
 @app.get("/download/{job_id}")
 def download_highlights(job_id: str) -> FileResponse:
-    """Download the final concatenated highlights video."""
     job = get_job(job_id)
 
     if not job:
