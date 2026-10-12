@@ -9,20 +9,10 @@
 
 An AI-powered system that automatically detects and extracts the most exciting moments from full football match videos. Upload a complete game and get a condensed highlights reel in minutes.
 
+Ce projet a été réalisé dans le cadre du module Traitement d'Image à l'École Nationale des Sciences Appliquées de Tanger (ENSAT), sous l'encadrement de M. LACHKAR ABDELMOUNAIM.
+
 ## About
 
-## Topics
-- Football Highlights
-- Video Processing
-- Audio Analysis
-- Computer Vision
-- FastAPI
-- FFmpeg
-- Sports Analytics
-- Event Detection
-
-
-This project was developed as part of the Image Processing module at the École Nationale des Sciences Appliquées de Tanger (ENSAT), under the supervision of Mr. LACHKAR Abdelmounaïm.
 
 It uses audio and video analysis to intelligently identify highlight-worthy moments in football matches - including goals, penalties, big chances, shots, fouls, corners, and general exciting play. Instead of manually scrubbing through 90+ minutes of footage, the system analyzes crowd reactions, commentary intensity, motion patterns, scene changes, and on-field activity to automatically clip and compile the key moments.
 
