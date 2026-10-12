@@ -9,7 +9,9 @@ An AI-powered system that automatically detects and extracts the most exciting m
 
 ## About
 
-This project uses audio and video analysis to intelligently identify highlight-worthy moments in football matches - including goals, penalties, big chances, shots, fouls, corners, and general exciting play. Instead of manually scrubbing through 90+ minutes of footage, the system analyzes crowd reactions, commentary intensity, motion patterns, scene changes, and on-field activity to automatically clip and compile the key moments.
+This project was developed as part of the Image Processing module at the **École Nationale des Sciences Appliquées de Tanger (ENSAT)**, under the supervision of **Mr. LACHKAR Abdelmounaïm**.
+
+It uses audio and video analysis to intelligently identify highlight-worthy moments in football matches - including goals, penalties, big chances, shots, fouls, corners, and general exciting play. Instead of manually scrubbing through 90+ minutes of footage, the system analyzes crowd reactions, commentary intensity, motion patterns, scene changes, and on-field activity to automatically clip and compile the key moments.
 
 The system employs a **fused audio-video heuristic pipeline (v6)** that combines:
 - **Audio analysis** (Librosa): Detects crowd roars, sustained excitement, spikes in energy, and vocal intensity
