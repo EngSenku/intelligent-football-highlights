@@ -100,30 +100,6 @@ python -m http.server 8080 --directory frontend
 
 3. Upload your football match video, wait for processing to complete, and download the generated highlights.
 
-## Topics
-- football-highlights
-- video-processing
-- audio-analysis
-- computer-vision
-- fastapi
-- opencv
-- librosa
-- ffmpeg
-- sports-analytics
-- highlight-detection
-
-## Topics
-- football-highlights
-- video-processing
-- audio-analysis
-- computer-vision
-- fastapi
-- opencv
-- librosa
-- ffmpeg
-- sports-analytics
-- highlight-detection
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
