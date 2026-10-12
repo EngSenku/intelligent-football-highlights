@@ -1,8 +1,26 @@
 # Intelligent Football Highlights
 
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.8+-5C3EE8?style=flat-square&logo=opencv&logoColor=white)
+![Librosa](https://img.shields.io/badge/Librosa-0.10+-orange?style=flat-square)
+![FFmpeg](https://img.shields.io/badge/FFmpeg-Required-007808?style=flat-square&logo=ffmpeg&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
 An AI-powered system that automatically detects and extracts the most exciting moments from full football match videos. Upload a complete game and get a condensed highlights reel in minutes.
 
 ## About
+
+## Topics
+- Football Highlights
+- Video Processing
+- Audio Analysis
+- Computer Vision
+- FastAPI
+- FFmpeg
+- Sports Analytics
+- Event Detection
+
 
 This project was developed as part of the Image Processing module at the École Nationale des Sciences Appliquées de Tanger (ENSAT), under the supervision of Mr. LACHKAR Abdelmounaïm.
 
